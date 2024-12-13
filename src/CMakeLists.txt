@@ -3,7 +3,7 @@ add_executable(receiver
     receiver.c
     )
 
-pico_set_program_name(receiver "test_rx")
+pico_set_program_name(receiver "test_receiver")
 pico_set_program_version(receiver "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB.
@@ -34,11 +34,39 @@ pico_add_extra_outputs(receiver)
 
 add_custom_target(flash_rx picotool load -f $<TARGET_FILE:receiver> DEPENDS receiver)
 
+add_executable(can
+    can.c
+)
+
+pico_set_program_name(can "test_can")
+pico_set_program_version(can "0.1")
+
+pico_enable_stdio_uart(can 0)
+pico_enable_stdio_usb(can 1)
+
+target_link_libraries(can PRIVATE
+  can2040
+  pico_stdlib
+  pico_multicore
+  pico_async_context_freertos
+  FreeRTOS-Kernel-Heap4
+)
+
+if(PICO_CYW43_SUPPORTED)
+    target_link_libraries(can PRIVATE
+        pico_cyw43_arch_none
+    )
+endif()
+
+pico_add_extra_outputs(can)
+
+add_custom_target(flash_babbling picotool load -f $<TARGET_FILE:sender> DEPENDS can)
+
 add_executable(sender
     sender.c
 )
 
-pico_set_program_name(sender "test_tx")
+pico_set_program_name(sender "test_sender")
 pico_set_program_version(sender "0.1")
 
 pico_enable_stdio_uart(sender 0)
