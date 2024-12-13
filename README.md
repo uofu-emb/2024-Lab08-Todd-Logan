@@ -1,3 +1,6 @@
+[![CMake](https://github.com/uofu-emb/2024-Lab08-Todd-Logan/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/uofu-emb/2024-Lab08-Todd-Logan/actions/workflows/main.yml)
+
+
 # Renode setup
 The Raspberry Pico needs configuration files for Renode to work properly.
 
