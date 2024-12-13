@@ -1,4 +1,4 @@
-[![CMake](https://github.com/uofu-emb/2024-Lab08-Todd-Logan/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/uofu-emb/2024-Lab08-Todd-Logan/actions/workflows/main.yml)
+[![CMake](https://github.com/uofu-emb/2024-Lab08-Todd-Logan/actions/workflows/main.yml/badge.svg?branch=dev2)](https://github.com/uofu-emb/2024-Lab08-Todd-Logan/actions/workflows/main.yml)
 
 
 # Renode setup
