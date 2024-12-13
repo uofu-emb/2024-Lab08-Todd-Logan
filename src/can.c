@@ -27,7 +27,7 @@ void canbus_setup(void)
 {
     uint32_t pio_num = 0;
     uint32_t sys_clock = 125000000, bitrate = 500000;
-    uint32_t gpio_rx = 8, gpio_tx = 7;
+    uint32_t gpio_rx = 4, gpio_tx = 5;
 
     // Setup canbus
     can2040_setup(&cbus, pio_num);
@@ -56,6 +56,7 @@ void sender_task(__unused void *params)
     msg.data[0] = 0x01;
 
     while (1) {
+
         if (can2040_transmit(&cbus, &msg))
         {
             printf("If Transmission failed.\n");
