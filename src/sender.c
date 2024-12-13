@@ -63,6 +63,7 @@ int main(void)
     stdio_init_all();
     canbus_setup();
     sleep_ms(1000);
+
     TaskHandle_t task;
     xTaskCreate(main_task, "MainThread",
                 configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1UL, &task);
