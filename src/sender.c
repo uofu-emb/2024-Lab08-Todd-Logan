@@ -1,4 +1,4 @@
-#include <can2040.h>
+#include "can2040.h"
 #include <hardware/regs/intctrl.h>
 #include <stdio.h>
 #include <pico/stdlib.h>
@@ -8,10 +8,9 @@
 
 static struct can2040 cbus;
 
-QueueHandle_t msgs;
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg)
 {
-    xQueueSendToBack(msgs, msg, portMAX_DELAY);
+    printf("Callback\n");
 }
 
 static void PIOx_IRQHandler(void)
@@ -40,16 +39,30 @@ void canbus_setup(void)
 
 void main_task(__unused void *params)
 {
-    struct can2040_msg data;
-    xQueueReceive(msgs, &data, portMAX_DELAY);
-    printf("Got message\n");
+    struct can2040_msg message;
+    message.id = 0x1;
+    message.dlc = 1;
+    message.data[0] = 0x01;
+
+    while (1) {
+        if (can2040_transmit(&cbus, &message))
+        {
+            printf("Transmission failed.\n");
+        }
+        else
+        {
+            printf("Transmission sent.\n");
+        }
+        
+        sleep_ms(1000);
+    }
 }
 
 int main(void)
 {
     stdio_init_all();
-    msgs = xQueueCreate(100, sizeof(struct can2040_msg));
     canbus_setup();
+    sleep_ms(1000);
     TaskHandle_t task;
     xTaskCreate(main_task, "MainThread",
                 configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1UL, &task);
