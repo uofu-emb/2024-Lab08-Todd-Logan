@@ -1,0 +1,11 @@
+#git submodule add https://github.com/raspberrypi/pico-sdk.git lib/pico-sdk
+#git submodule add https://git@github.com/FreeRTOS/FreeRTOS-Kernel.git lib/freertos
+#git submodule add https://github.com/ThrowTheSwitch/Unity.git lib/unity
+git submodule add https://github.com/uofu-emb/can2040.git lib/can2040
+#git submodule update --init --recursive
+
+#sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/picotool load /Users/toddnielsen/ECE_6785/2024-Lab08-Todd-Logan/build/src/receiver.elf -fx
+
+#sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/picotool load /Users/toddnielsen/ECE_6785/2024-Lab08-Todd-Logan/build/src/sender.elf -fx
+
+sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/picotool load /Users/toddnielsen/ECE_6785/2024-Lab08-Todd-Logan/build/src/realtime.elf -fx
