@@ -1,4 +1,4 @@
-#include "can2040.h"
+#include <can2040.h>
 #include <hardware/regs/intctrl.h>
 #include <stdio.h>
 #include <pico/stdlib.h>
@@ -6,11 +6,18 @@
 #include <task.h>
 #include <queue.h>
 
-int task_id = 1
-;
+#define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY  )
+//#define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
+#define MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
+
+
+//#define SEND_TASK_PRIORITY      ( tskIDLE_PRIORITY + 2UL )
+#define SEND_TASK_PRIORITY      ( tskIDLE_PRIORITY )
+#define SEND_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
 static struct can2040 cbus;
+
 QueueHandle_t message;
 
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg)
@@ -42,54 +49,69 @@ void canbus_setup(void)
     can2040_start(&cbus, sys_clock, bitrate, gpio_rx, gpio_tx);
 }
 
-void sender_task(__unused void *params)
-{
-    struct can2040_msg msg;
+void main_thread(void *params){
+    canbus_setup();
 
-    if(task_id ==1) {
-        msg.id = 0x1;
-    }
-    else{
-        msg.id = 0x2;
-    }
-    msg.dlc = 1;
-    msg.data[0] = 0x01;
-
-    while (1) {
-
-        if (can2040_transmit(&cbus, &msg))
-        {
-            printf("If Transmission failed.\n");
-        }
-        else
-        {
-            printf("Else Transmission sent.\n");
-        }
-        sleep_ms(1000);
-     
+    while(1) {
+        //Creat a message struct and receive message from the queue. Print message.
+        struct can2040_msg msg;
+        xQueueReceive(message, &msg, portMAX_DELAY); 
+        printf("Recieved message: %d,%s\n", msg.id, msg.data);
     }
 }
 
-void receiver_task(__unused void *params)
-{
-    struct can2040_msg data;
-    while (1) {
+void send_thread(void *params){
 
-        xQueueReceive(message, &data, portMAX_DELAY);
-        printf("Got message\n");
+    while(1){
+
+        //Create a message struct and put hello into the data. Priority of 200. (Low)
+        struct can2040_msg send_msg;
+        send_msg.id = 0x200;
+        send_msg.dlc = 7;
+        send_msg.data[0] = 'H';
+        send_msg.data[1] = 'i';
+        send_msg.data[2] = '_';
+        send_msg.data[3] = '6';
+        send_msg.data[4] = '7';
+        send_msg.data[5] = '8';
+        send_msg.data[6] = '5';
+
+        //Send the message and check status
+        int status = can2040_transmit(&cbus, &send_msg);
+
+        //Check if the message was sent successfully
+        // if(status == 0){
+        //     printf("Message sent\n");
+        // } else if (status < 0) {
+        //     printf("No space on CAN message queue.\n");
+        // }
+      if(status == 0){
+            printf("Message sent\n");
+        } else if (status < 0) {
+            printf("Message failed.\n");
+        }
+
+        //Delay so we can see whats happening.
+        vTaskDelay(50);
     }
 }
 
 int main(void)
 {
+    //Initialize and wait for 5 seconds.
     stdio_init_all();
-    canbus_setup();
-    TaskHandle_t sender_task_handle, receiver_task_handle;
-    xTaskCreate(sender_task, "TxThread",
-                configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1UL, &sender_task_handle);
-             //   sleep_ms(1000);
-    xTaskCreate(receiver_task, "RxThread",
-               configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1UL, &receiver_task_handle);
+    sleep_ms(5000);
+      //sleep_ms(2500);
+    printf("Initializing......\n");
+
+    //Create queue. Setup the CAN bus. Create threads. Start scheduler.
+    message = xQueueCreate(100, sizeof(struct can2040_msg));
+    TaskHandle_t main_task, send_task;
+    xTaskCreate(main_thread, "MainThread",
+            MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_task);
+    xTaskCreate(send_thread, "SendThread",
+            SEND_TASK_STACK_SIZE, NULL, SEND_TASK_PRIORITY, &send_task);
     vTaskStartScheduler();
-    return 0;
+
+    return(0);
 }

@@ -1,4 +1,4 @@
-#include "can2040.h"
+#include <can2040.h>
 #include <hardware/regs/intctrl.h>
 #include <stdio.h>
 #include <pico/stdlib.h>
@@ -6,7 +6,11 @@
 #include <task.h>
 #include <queue.h>
 
+#define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
+#define MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
+
 static struct can2040 cbus;
+
 QueueHandle_t message;
 
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg)
@@ -38,26 +42,29 @@ void canbus_setup(void)
     can2040_start(&cbus, sys_clock, bitrate, gpio_rx, gpio_tx);
 }
 
-void main_task(__unused void *params)
-{
-    struct can2040_msg data;
-    while (1) {
-        xQueueReceive(message, &data, portMAX_DELAY);
-        printf("Got message\n");
-    }  
-
+void main_thread(void *params){
+    while(1) {
+        //Creat a message struct and receive message from the queue. Print message.
+        struct can2040_msg msg;
+        xQueueReceive(message, &msg, portMAX_DELAY); 
+        printf("Recieved message: %d,%s\n", msg.id, msg.data);
+    }
 }
 
 int main(void)
 {
+    //Initialize and wait for 5 seconds.
     stdio_init_all();
+    sleep_ms(5000);
+    printf("Initializing......\n");
+
+    //Create queue. Setup the CAN bus. Create threads. Start scheduler.
     message = xQueueCreate(100, sizeof(struct can2040_msg));
     canbus_setup();
-    TaskHandle_t task;
-    xTaskCreate(main_task, "MainThread",
-                configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1UL, &task);
-   
-    sleep_ms(1000);
+    TaskHandle_t main_task, send_task;
+    xTaskCreate(main_thread, "MainThread",
+            MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_task);
     vTaskStartScheduler();
-    return 0;
+
+    return(0);
 }

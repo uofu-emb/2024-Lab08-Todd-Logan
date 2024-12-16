@@ -50,6 +50,7 @@ void canbus_setup(void)
 ![Serial Monitor](pics/Lab08_Serial_Monitor_Message.png "Serial Monitor")
 1. Observe the electrical behavior of the bus line and the microcontroller lines.
 
+
 ## Activity
 This activity will observe bus contention from a babbling node. "In a Controller Area Network a babbling node is a node continuously (and usually erroneously) transmitting CAN frames with identical - often high - priority."
 
@@ -60,4 +61,13 @@ This activity will observe bus contention from a babbling node. "In a Controller
 1. Observe how often the lower priority message is actually transmitted and received.
 1. Introduce a short busy wait delay into the babbling node, slowly increase the duration until you observe the other messages consistently received.
 1. Document your observations in your repository.
+![Priority One](pics/no_delay_diff_priority.png "Priority One")
+
+1. Document your observations in your repository.
+![Priority Two](pics/lo_priority.png "Priority Two")
+
+1. Document your observations in your repository.
+![Priority](pics/delay_diff_priority.png "Priority")
+
+
 
