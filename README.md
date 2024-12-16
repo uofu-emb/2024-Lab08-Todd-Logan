@@ -62,12 +62,8 @@ This activity will observe bus contention from a babbling node. "In a Controller
 1. Introduce a short busy wait delay into the babbling node, slowly increase the duration until you observe the other messages consistently received.
 1. Document your observations in your repository.
 ![Priority One](pics/no_delay_diff_priority.png "Priority One")
-
-1. Document your observations in your repository.
 ![Priority Two](pics/lo_priority.png "Priority Two")
-
-1. Document your observations in your repository.
-![Priority](pics/delay_diff_priority.png "Priority")
+![Priority Three](pics/delay_diff_priority.png "Priority Three")
 
 
 
