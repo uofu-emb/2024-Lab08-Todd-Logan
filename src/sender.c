@@ -90,7 +90,7 @@ int main(void)
 
     stdio_init_all();
     sleep_ms(1000);
-    printf("Initializing......\n");
+    printf("Hello......\n");
 
     //Create queue. Setup the CAN bus. Create threads. Start scheduler.
     message = xQueueCreate(100, sizeof(struct can2040_msg));

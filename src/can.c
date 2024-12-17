@@ -89,7 +89,7 @@ int main(void)
 {
     stdio_init_all();
     sleep_ms(1000);
-    printf("Initializing......\n");
+    printf("Hello.....\n");
 
     message = xQueueCreate(100, sizeof(struct can2040_msg));
     TaskHandle_t main_task, send_task;
