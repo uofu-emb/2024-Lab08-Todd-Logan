@@ -53,7 +53,6 @@ void main_thread(void *params){
     canbus_setup();
 
     while(1) {
-        //Creat a message struct and receive message from the queue. Print message.
         struct can2040_msg msg;
         xQueueReceive(message, &msg, portMAX_DELAY); 
         printf("Recieved message: %d,%s\n", msg.id, msg.data);
@@ -64,7 +63,6 @@ void send_thread(void *params){
 
     while(1){
 
-        //Create a message struct and put hello into the data. Priority of 200. (Low)
         struct can2040_msg send_msg;
         send_msg.id = 0x200;
         send_msg.dlc = 7;
@@ -76,35 +74,23 @@ void send_thread(void *params){
         send_msg.data[5] = '8';
         send_msg.data[6] = '5';
 
-        //Send the message and check status
         int status = can2040_transmit(&cbus, &send_msg);
 
-        //Check if the message was sent successfully
-        // if(status == 0){
-        //     printf("Message sent\n");
-        // } else if (status < 0) {
-        //     printf("No space on CAN message queue.\n");
-        // }
       if(status == 0){
             printf("Message sent\n");
         } else if (status < 0) {
             printf("Message failed.\n");
         }
-
-        //Delay so we can see whats happening.
         vTaskDelay(50);
     }
 }
 
 int main(void)
 {
-    //Initialize and wait for 5 seconds.
     stdio_init_all();
-    sleep_ms(5000);
-      //sleep_ms(2500);
+    sleep_ms(1000);
     printf("Initializing......\n");
 
-    //Create queue. Setup the CAN bus. Create threads. Start scheduler.
     message = xQueueCreate(100, sizeof(struct can2040_msg));
     TaskHandle_t main_task, send_task;
     xTaskCreate(main_thread, "MainThread",

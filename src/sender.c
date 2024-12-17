@@ -67,39 +67,30 @@ void send_thread(void *params){
         send_msg.dlc = 7;
         send_msg.data[0] = 'C';
         send_msg.data[1] = 'E';
-        // send_msg.data[2] = 'g';
-        // send_msg.data[3] = 'h';
-        // send_msg.data[4] = 'p';
-        // send_msg.data[5] = 'r';
-        // send_msg.data[6] = 'i';
-        // send_msg.data[7] = 'o';
-          send_msg.data[2] = '_';
+        send_msg.data[2] = '_';
         send_msg.data[3] = '6';
         send_msg.data[4] = '7';
         send_msg.data[5] = '8';
-             send_msg.data[6] = '5';
+        send_msg.data[6] = '5';
 
-        //Send the message and check status
         int status = can2040_transmit(&cbus, &send_msg);
 
-        //Check if the message was sent successfully
         if(status == 0){
             printf("Message sent\n");
         } else if (status < 0) {
             printf("Message failed.\n");
         }
 
-        //Delay so we can see whats happening.
         vTaskDelay(50);
     }
 }
 
 int main(void)
 {
-    //Initialize and wait for 5 seconds.
+
     stdio_init_all();
-    sleep_ms(5000);
-     printf("Initializing......\n");
+    sleep_ms(1000);
+    printf("Initializing......\n");
 
     //Create queue. Setup the CAN bus. Create threads. Start scheduler.
     message = xQueueCreate(100, sizeof(struct can2040_msg));

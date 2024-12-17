@@ -44,7 +44,6 @@ void canbus_setup(void)
 
 void main_thread(void *params){
     while(1) {
-        //Creat a message struct and receive message from the queue. Print message.
         struct can2040_msg msg;
         xQueueReceive(message, &msg, portMAX_DELAY); 
         printf("Recieved message: %d,%s\n", msg.id, msg.data);
@@ -53,12 +52,10 @@ void main_thread(void *params){
 
 int main(void)
 {
-    //Initialize and wait for 5 seconds.
     stdio_init_all();
-    sleep_ms(5000);
+    sleep_ms(1000);
     printf("Initializing......\n");
 
-    //Create queue. Setup the CAN bus. Create threads. Start scheduler.
     message = xQueueCreate(100, sizeof(struct can2040_msg));
     canbus_setup();
     TaskHandle_t main_task, send_task;
